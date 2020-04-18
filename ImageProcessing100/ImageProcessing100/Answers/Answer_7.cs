@@ -15,13 +15,7 @@ namespace ImageProcessing100.Answers
         {
             var img = Cv2.ImRead("imori.jpg");
 
-            var sw = new Stopwatch();
-            sw.Start();
-
             var output = UsingSubMat(img);
-
-            sw.Stop();
-            Console.WriteLine(sw.ElapsedTicks);
 
             //Cv2.ImWrite("out.jpg", output);
             Cv2.ImShow("sample", output);

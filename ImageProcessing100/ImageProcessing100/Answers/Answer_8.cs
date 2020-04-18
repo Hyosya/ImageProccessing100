@@ -28,8 +28,8 @@ namespace ImageProcessing100.Answers
             var maxBGR = (byte.MinValue, byte.MinValue, byte.MinValue);
             var points = Enumerable.Range(0, img.Rows / range).Select(i => i * range);
             var mainIndexes = points
-                .SelectMany(_ => points, (x, y) => (x, y))
-                .ToArray();
+                .SelectMany(_ => points, (x, y) => (x, y));
+
             var subIndexes = Enumerable.Range(0, range)
                 .SelectMany(_ => Enumerable.Range(0, range), (x, y) => (x, y))
                 .ToArray();
@@ -48,10 +48,12 @@ namespace ImageProcessing100.Answers
                 outSubIndexer = outMat.SubMat(y, y + range, x, x + range).GetGenericIndexer<Vec3b>();
                 foreach (var (xi, yi) in subIndexes)
                 {
-                    var pixel = outSubIndexer[xi, yi];
-                    pixel.Item0 = maxBGR.Item1;
-                    pixel.Item1 += maxBGR.Item2;
-                    pixel.Item2 += maxBGR.Item3;
+                    var pixel = new Vec3b()
+                    {
+                        Item0 = maxBGR.Item1,
+                        Item1 = maxBGR.Item2,
+                        Item2 = maxBGR.Item3,
+                    };
                     outSubIndexer[xi, yi] = pixel;
                 }
             }
