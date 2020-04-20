@@ -1,9 +1,5 @@
 ﻿using OpenCvSharp;
 using System;
-using System.Collections.Generic;
-using System.Diagnostics;
-using System.Linq;
-using System.Text;
 
 namespace ImageProcessing100.Answers
 {
@@ -13,7 +9,7 @@ namespace ImageProcessing100.Answers
         {
             var img = Cv2.ImRead("imori_noise.jpg");
 
-            var output = GaussianFiliter(img, 3, 1.3);
+            var output = MedianFiliter(img, 3);
 
             //Cv2.ImWrite("out.jpg", output);
             Cv2.ImShow("sample", output);
@@ -21,47 +17,60 @@ namespace ImageProcessing100.Answers
             Cv2.DestroyAllWindows();
         }
 
-        private static Mat GaussianFiliter(Mat img, int kernelSize, double stdDev)
+        private static Mat MedianFiliter(Mat img, int kernelSize)
         {
             var outMat = Mat.Zeros(img.Rows, img.Height, MatType.CV_8UC3).ToMat();
-            var kernel = new double[kernelSize, kernelSize];
-
             var pad = kernelSize / 2;
-            var kernelSum = 0d;
-            for (int y = 0; y < kernelSize; y++)
-                for (int x = 0; x < kernelSize; x++)
-                {
-                    var _y = y - pad;
-                    var _x = x - pad;
-                    kernel[y, x] = 1 / (2 * Math.PI * stdDev * stdDev) * Math.Exp(-(_x * _x + _y * _y) / (2 * stdDev * stdDev));
-                    kernelSum += kernel[y, x];
-                }
-
-            for (int y = 0; y < kernelSize; y++)
-                for (int x = 0; x < kernelSize; x++)
-                    kernel[y, x] /= kernelSum;
-
-            double b, g, r;
+            var arraySize = kernelSize * kernelSize;
+            Span<byte> bArray = stackalloc byte[arraySize];
+            Span<byte> gArray = stackalloc byte[arraySize];
+            Span<byte> rArray = stackalloc byte[arraySize];
             for (int y = 0; y < img.Height; y++)
                 for (int x = 0; x < img.Cols; x++)
                 {
-                    b = g = r = 0d;
                     for (int dy = -pad; dy < pad + 1; dy++)
                         for (int dx = -pad; dx < pad + 1; dx++)
                         {
-                            if ((x + dx < 0) || (y + dy < 0)) continue;
-
+                            var i = dx + pad + ((dy + pad) * kernelSize);
+                            if ((x + dx < 0) || (y + dy < 0))
+                            {
+                                bArray[i] = byte.MinValue;
+                                gArray[i] = byte.MinValue;
+                                rArray[i] = byte.MinValue;
+                                continue;
+                            }
                             var pixel = img.GetGenericIndexer<Vec3b>()[y + dy, x + dx];
-                            b += pixel.Item0 * kernel[dy + pad, dx + pad];
-                            g += pixel.Item1 * kernel[dy + pad, dx + pad];
-                            r += pixel.Item2 * kernel[dy + pad, dx + pad];
-
+                            bArray[i] = pixel.Item0;
+                            gArray[i] = pixel.Item1;
+                            rArray[i] = pixel.Item2;
                         }
-                    outMat.GetGenericIndexer<Vec3b>()[y, x] = new Vec3b((byte)b, (byte)g, (byte)r);
+                    SpanQuickSort(bArray);
+                    SpanQuickSort(gArray);
+                    SpanQuickSort(rArray);
+                    outMat.GetGenericIndexer<Vec3b>()[y, x] =
+                        new Vec3b(bArray[arraySize / 2], gArray[arraySize / 2], rArray[arraySize / 2]);
                 }
-
-
             return outMat;
+        }
+
+        private static void SpanQuickSort(Span<byte> byteSpan)
+        {
+            if (byteSpan.Length < 2) return;
+            var pivot = byteSpan[byteSpan.Length / 2];
+            var x = 0;
+            var y = byteSpan.Length - 1;
+            while (true)
+            {
+                while (byteSpan[x] < pivot) x++;
+                while (byteSpan[y] > pivot) y--;
+                if (x >= y) break;
+                var temp = byteSpan[x];
+                byteSpan[x] = byteSpan[y];
+                byteSpan[y] = temp;
+                x++; y--;
+            }
+            SpanQuickSort(byteSpan.Slice(0, x));
+            SpanQuickSort(byteSpan[(y + 1)..]);
         }
     }
 }

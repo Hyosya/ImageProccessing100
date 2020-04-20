@@ -1,7 +1,6 @@
 ﻿using OpenCvSharp;
 using System;
-using System.Collections.Generic;
-using System.Text;
+using System.Diagnostics;
 
 namespace ImageProcessing100.Answers
 {
@@ -37,6 +36,16 @@ namespace ImageProcessing100.Answers
                 });
             }
             return newMat;
+        }
+
+        public static T MeasureTicks<T>(Func<T> func)
+        {
+            var sw = new Stopwatch();
+            sw.Start();
+            var retValue = func();
+            sw.Stop();
+            Console.WriteLine(sw.ElapsedTicks);
+            return retValue;
         }
     }
 }
