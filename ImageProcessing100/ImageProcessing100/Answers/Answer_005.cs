@@ -5,7 +5,7 @@ using System.Text;
 
 namespace ImageProcessing100.Answers
 {
-    public static class Answer_5
+    public static class Answer_005
     {
         public static void Solve()
         {

@@ -7,7 +7,7 @@ using OpenCvSharp;
 
 namespace ImageProcessing100.Answers
 {
-    public static class Answer_3
+    public static class Answer_003
     {
         public static void Solve()
         {

@@ -3,13 +3,13 @@ using System;
 
 namespace ImageProcessing100.Answers
 {
-    public static class Answer_10
+    public static class Answer_010
     {
         public static void Solve()
         {
             var img = Cv2.ImRead("imori_noise.jpg");
 
-            var output = MedianFiliter(img, 3);
+            var output = MedianFilter(img, 3);
 
             //Cv2.ImWrite("out.jpg", output);
             Cv2.ImShow("sample", output);
@@ -17,7 +17,7 @@ namespace ImageProcessing100.Answers
             Cv2.DestroyAllWindows();
         }
 
-        private static Mat MedianFiliter(Mat img, int kernelSize)
+        private static Mat MedianFilter(Mat img, int kernelSize)
         {
             var outMat = Mat.Zeros(img.Rows, img.Height, MatType.CV_8UC3).ToMat();
             var pad = kernelSize / 2;
