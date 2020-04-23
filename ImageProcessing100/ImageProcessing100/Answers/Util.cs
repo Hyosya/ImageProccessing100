@@ -27,12 +27,13 @@ namespace ImageProcessing100.Answers
         {
             if (mat.Channels() != 3) throw new ArgumentException();
             var newMat = Mat.Zeros(mat.Rows, mat.Cols, MatType.CV_8UC1).ToMat();
+            var newIndexer = newMat.GetGenericIndexer<byte>();
             unsafe
             {
                 mat.ForEachAsVec3b((value, position) =>
                 {
-                    var newPixel = (byte*)newMat.Ptr(position[0], position[1]);
-                    *newPixel = (byte)(0.2126f * value->Item2 + 0.7152f * value->Item1 + 0.0722f * value->Item0);
+                    newIndexer[position[0], position[1]]
+                    = (byte)(0.2126f * value->Item2 + 0.7152f * value->Item1 + 0.0722f * value->Item0);
                 });
             }
             return newMat;
