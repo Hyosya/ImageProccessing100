@@ -41,13 +41,6 @@ namespace ImageProcessing100.Answers
                 for (int x = 0; x < kernelSize; x++)
                     kernel[y, x] /= kernelSum;
 
-            var a = 0d;
-            foreach (var item in kernel)
-            {
-                a += item;
-            }
-
-
             double b, g, r;
             for (int y = 0; y < img.Height; y++)
                 for (int x = 0; x < img.Cols; x++)
