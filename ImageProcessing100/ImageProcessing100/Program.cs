@@ -7,7 +7,7 @@ namespace ImageProcessing100
     {
         static void Main(string[] args)
         {
-            Answer_015.Solve();
+            Answer_016.Solve();
         }
     }
 }

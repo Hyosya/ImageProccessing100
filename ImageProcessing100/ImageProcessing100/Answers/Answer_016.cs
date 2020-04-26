@@ -4,13 +4,13 @@ using System.Numerics;
 
 namespace ImageProcessing100.Answers
 {
-    public static class Answer_015
+    public static class Answer_016
     {
         public static void Solve()
         {
             var img = Cv2.ImRead("imori.jpg");
             var gray = Util.GBRToGray(img);
-            var output = PrewittFilter(gray, true);
+            var output = SobelFilter(gray, false);
 
             //Cv2.ImWrite("out.jpg", output);
             Cv2.ImShow("sample", output);
@@ -18,7 +18,7 @@ namespace ImageProcessing100.Answers
             Cv2.DestroyAllWindows();
         }
 
-        private static Mat PrewittFilter(Mat img, bool isVertical)
+        private static Mat SobelFilter(Mat img, bool isVertical)
         {
             var outMat = Mat.Zeros(img.Rows, img.Height, MatType.CV_8UC1).ToMat();
             int[,] kernel;
@@ -26,9 +26,9 @@ namespace ImageProcessing100.Answers
             {
                 kernel = new int[3, 3]
                 {
-                    { 1, 1, 1},
+                    { 1, 2, 1},
                     { 0, 0, 0},
-                    { -1, -1, -1},
+                    { -1, -2, -1},
                 };
             }
             else
@@ -36,7 +36,7 @@ namespace ImageProcessing100.Answers
                 kernel = new int[3, 3]
                 {
                     { 1, 0, -1},
-                    { 1, 0, -1},
+                    { 2, 0, -2},
                     { 1, 0, -1},
                 };
             }
