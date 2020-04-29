@@ -7,13 +7,14 @@ using System.Text;
 
 namespace ImageProcessing100.Answers
 {
-    public static class Answer_009
+    public static class Answer_019
     {
         public static void Solve()
         {
             var img = Cv2.ImRead("imori_noise.jpg");
 
-            var output = GaussianFiliter(img, 3, 1.3);
+            var gray = Util.GBRToGray(img);
+            var output = LoGFiliter(gray, 5, 1.3);
 
             //Cv2.ImWrite("out.jpg", output);
             Cv2.ImShow("sample", output);
@@ -21,9 +22,9 @@ namespace ImageProcessing100.Answers
             Cv2.DestroyAllWindows();
         }
 
-        private static Mat GaussianFiliter(Mat img, int kernelSize, double stdDev)
+        private static Mat LoGFiliter(Mat img, int kernelSize, double stdDev)
         {
-            var outMat = Mat.Zeros(img.Rows, img.Height, MatType.CV_8UC3).ToMat();
+            var outMat = Mat.Zeros(img.Rows, img.Height, MatType.CV_8UC1).ToMat();
             var kernel = new double[kernelSize, kernelSize];
 
             var pad = kernelSize / 2;
@@ -33,33 +34,31 @@ namespace ImageProcessing100.Answers
                 {
                     var _y = y - pad;
                     var _x = x - pad;
-                    kernel[y, x] = 1 / (2 * Math.PI * stdDev * stdDev) * Math.Exp(-(_x * _x + _y * _y) / (2 * stdDev * stdDev));
+                    kernel[y, x] = (_x * _x + _y * _y - 2 * stdDev * stdDev) / (2 * Math.PI * Math.Pow(stdDev, 6)) * Math.Exp(-(_x * _x + _y * _y) / (2 * stdDev * stdDev));
                     kernelSum += kernel[y, x];
                 }
+
 
             for (int y = 0; y < kernelSize; y++)
                 for (int x = 0; x < kernelSize; x++)
                     kernel[y, x] /= kernelSum;
 
-            double b, g, r;
-            var imgIndexer = img.GetGenericIndexer<Vec3b>();
-            var outIndexer = outMat.GetGenericIndexer<Vec3b>();
+
+            var imgIndexer = img.GetGenericIndexer<byte>();
+            var outIndexer = outMat.GetGenericIndexer<byte>();
             for (int y = 0; y < img.Height; y++)
                 for (int x = 0; x < img.Cols; x++)
                 {
-                    b = g = r = 0d;
+                    var v = 0d;
                     for (int dy = -pad; dy < pad + 1; dy++)
                         for (int dx = -pad; dx < pad + 1; dx++)
                         {
-                            if ((x + dx < 0) || (y + dy < 0)) continue;
+                            if ((x + dx < 0) || (y + dy < 0) || (x + dx >= img.Width) || (y + dy >= img.Height)) continue;
 
                             var pixel = imgIndexer[y + dy, x + dx];
-                            b += pixel.Item0 * kernel[dy + pad, dx + pad];
-                            g += pixel.Item1 * kernel[dy + pad, dx + pad];
-                            r += pixel.Item2 * kernel[dy + pad, dx + pad];
-
+                            v += pixel * kernel[dy + pad, dx + pad];
                         }
-                    outIndexer[y, x] = new Vec3b((byte)b, (byte)g, (byte)r);
+                    outIndexer[y, x] = (byte)Math.Max(Math.Min(v, 255d), 0d);
                 }
 
 
