@@ -12,9 +12,11 @@ namespace ImageProcessing100.Answers
             var img = Cv2.ImRead("imori_dark.jpg");
 
             var output = HistogramNormalization(img, byte.MinValue, byte.MaxValue);
+            var hist = Util.MakeHistogram(output);
 
             //Cv2.ImWrite("out.jpg", output);
             Cv2.ImShow("sample", output);
+            Cv2.ImShow("Histogram", hist);
             Cv2.WaitKey(0);
             Cv2.DestroyAllWindows();
         }
