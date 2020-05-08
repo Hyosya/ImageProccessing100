@@ -1,4 +1,6 @@
 ﻿using OpenCvSharp;
+using OpenCvSharp.Extensions;
+using ScottPlot;
 using System;
 using System.Diagnostics;
 
@@ -47,6 +49,28 @@ namespace ImageProcessing100.Answers
             sw.Stop();
             Console.WriteLine(sw.ElapsedTicks);
             return retValue;
+        }
+
+        public static Mat MakeHistogram(Mat mat)
+        {
+            double[] array;
+            unsafe
+            {
+                var span = new ReadOnlySpan<byte>(mat.Data.ToPointer(), (int)mat.Total() * mat.Channels());
+                array = new double[span.Length];
+                for (int i = 0; i < span.Length; i++)
+                {
+                    array[i] = span[i];
+                }
+            }
+
+            var plt = new Plot(640, 480);
+            var hist = new ScottPlot.Statistics.Histogram(array, min: 0, max: 255, binSize: 1);
+            plt.PlotBar(hist.bins, hist.counts, barWidth: hist.binSize, outlineWidth: 0);
+            plt.Axis(null, null, 0, null);
+            plt.Grid(lineStyle: LineStyle.Dot);
+            var bitmap = plt.GetBitmap();
+            return bitmap.ToMat();
         }
     }
 }
