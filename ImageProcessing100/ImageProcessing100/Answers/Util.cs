@@ -66,7 +66,7 @@ namespace ImageProcessing100.Answers
 
             var plt = new Plot(640, 480);
             var hist = new ScottPlot.Statistics.Histogram(array, min: 0, max: 255, binSize: 1);
-            plt.PlotBar(hist.bins, hist.counts, barWidth: hist.binSize, outlineWidth: 0);
+            plt.PlotBar(hist.bins, hist.counts, barWidth: hist.binSize , outlineWidth: 0);
             plt.Axis(null, null, 0, null);
             plt.Grid(lineStyle: LineStyle.Dot);
             var bitmap = plt.GetBitmap();
