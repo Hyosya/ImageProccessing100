@@ -30,7 +30,7 @@ namespace ImageProcessing100.Answers
                 outMat.ForEachAsVec3b((value, position) =>
                 {
                     var x = round(position[0] / resizeX);
-                    var y = round(position[1] / resizeX);
+                    var y = round(position[1] / resizeY);
                     *value = imgIndexer[x, y];
                 });
             }
