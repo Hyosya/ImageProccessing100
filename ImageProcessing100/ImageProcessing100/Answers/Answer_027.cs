@@ -66,7 +66,7 @@ namespace ImageProcessing100.Answers
             var tAbs = Math.Abs(t);
             if (Math.Abs(t) <= 1)
             {
-                return (a + 2d) * Math.Pow(tAbs, 3) - (a + 3) * Math.Pow(t, 2) + 1;
+                return (a + 2d) * Math.Pow(tAbs, 3) - (a + 3) * Math.Pow(tAbs, 2) + 1;
             }
             else if (tAbs <= 2)
             {
