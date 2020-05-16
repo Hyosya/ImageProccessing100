@@ -5,17 +5,18 @@ using System.Text;
 
 namespace ImageProcessing100.Answers
 {
-    class Answer_028
+    public static class Answer_029
     {
         public static void Solve()
         {
             var img = Cv2.ImRead("imori.jpg");
 
-            var output = Affine(img, 1d, 0d, 0d, 1d, 30d, -30d);
+            var answer1 = Affine(img, 1.3d, 0d, 0d, 0.8d, 0d, 0d);
+            var answer2 = Affine(img, 1.3d, 0d, 0d, 0.8d, 30d, -30d);
 
             //Cv2.ImWrite("out.jpg", output);
-            //Cv2.ImShow("source", img);
-            Cv2.ImShow("result", output);
+            Cv2.ImShow("answer1", answer1);
+            Cv2.ImShow("answer2", answer2);
             Cv2.WaitKey(0);
             Cv2.DestroyAllWindows();
         }
@@ -27,7 +28,7 @@ namespace ImageProcessing100.Answers
             var resized_width = (int)(img.Width * a);
             var resized_height = (int)(img.Height * d);
             var outMat = Mat.Zeros(resized_height, resized_width, img.Type()).ToMat();
-            
+
             var outIndexer = outMat.GetGenericIndexer<Vec3b>();
             var imgIndexer = img.GetGenericIndexer<Vec3b>();
             for (int y = 0; y < resized_height; y++)
@@ -41,6 +42,7 @@ namespace ImageProcessing100.Answers
                     // get original position y
                     var y_before = (int)((-c * x + a * y) / det - ty);
                     if ((y_before < 0) || (y_before >= img.Height)) continue;
+
                     outIndexer[y, x] = imgIndexer[y_before, x_before];
                 }
             return outMat;
