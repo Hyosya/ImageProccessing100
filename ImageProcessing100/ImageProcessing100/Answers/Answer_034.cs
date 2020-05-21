@@ -3,11 +3,10 @@ using System;
 using System.Collections.Generic;
 using System.Numerics;
 using System.Text;
-using System.Xml.Linq;
 
 namespace ImageProcessing100.Answers
 {
-    public static class Answer_033
+    public static class Answer_034
     {
         public static void Solve()
         {
@@ -16,8 +15,8 @@ namespace ImageProcessing100.Answers
             var gray = Util.GBRToGray(img);
             var fourier = DFT(gray);
             var outMat = Mat.Zeros(img.Height, img.Width, MatType.CV_8UC1).ToMat();
-            
-            LowPassFilter(fourier, 0.5d);
+
+            HighPassFilter(fourier, 0.1d);
             IDFT(outMat, fourier);
 
             //Cv2.ImWrite("out.jpg", output);
@@ -83,7 +82,7 @@ namespace ImageProcessing100.Answers
         }
 
 
-        private static void LowPassFilter(Complex[,] fourier_s, double pass_r)
+        private static void HighPassFilter(Complex[,] fourier_s, double pass_r)
         {
             var height = fourier_s.GetLength(0) - 1;
             var width = fourier_s.GetLength(1) - 1;
@@ -92,13 +91,12 @@ namespace ImageProcessing100.Answers
             for (int j = 0; j < height / 2; j++)
                 for (int i = 0; i < width / 2; i++)
                 {
-                    if (Math.Sqrt(i * i + j * j) < filter_d) continue;
+                    if (Math.Sqrt(i * i + j * j) > filter_d) continue;
                     fourier_s[j, i] = 0;
                     fourier_s[j, width - i] = 0;
                     fourier_s[height - i, i] = 0;
                     fourier_s[height - i, width - i] = 0;
                 }
-
         }
     }
 }
