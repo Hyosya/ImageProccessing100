@@ -6,7 +6,7 @@ using System.Text;
 
 namespace ImageProcessing100.Answers
 {
-    public static class Answer_034
+    public static class Answer_035
     {
         public static void Solve()
         {
@@ -16,7 +16,7 @@ namespace ImageProcessing100.Answers
             var fourier = DFT(gray);
             var outMat = Mat.Zeros(img.Height, img.Width, MatType.CV_8UC1).ToMat();
 
-            HighPassFilter(fourier, 0.1d);
+            BandPassFilter(fourier, 0.1d, 0.5d);
             IDFT(outMat, fourier);
 
             //Cv2.ImWrite("out.jpg", output);
@@ -81,16 +81,18 @@ namespace ImageProcessing100.Answers
                 }
         }
 
-        private static void HighPassFilter(Complex[,] fourier_s, double pass_r)
+        private static void BandPassFilter(Complex[,] fourier_s, double passLower, double passUpper)
         {
             var height = fourier_s.GetLength(0) - 1;
             var width = fourier_s.GetLength(1) - 1;
             var r = height / 2;
-            var filter_d = (int)(r * pass_r);
+            var upperThreshold = (int)(r * passUpper);
+            var lowerThreshold = (int)(r * passLower);
             for (int j = 0; j < height / 2; j++)
                 for (int i = 0; i < width / 2; i++)
                 {
-                    if (Math.Sqrt(i * i + j * j) > filter_d) continue;
+                    var target = Math.Sqrt(i * i + j * j);
+                    if (target < lowerThreshold || upperThreshold < target) continue;
                     fourier_s[j, i] = 0;
                     fourier_s[j, width - i] = 0;
                     fourier_s[height - i, i] = 0;
